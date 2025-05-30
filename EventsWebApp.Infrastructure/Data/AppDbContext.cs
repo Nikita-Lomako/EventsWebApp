@@ -19,10 +19,13 @@ namespace EventsWebApp.Infrastructure.Data
         }
 
         public DbSet<AppUser> AppUsers { get; set; }
+        public DbSet<Event> Events { get; set; }
+        public DbSet<Participant> Participants { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            base.OnModelCreating(modelBuilder); // 
-            //modelBuilder.Seed(); // Вызов нашего метода
+            base.OnModelCreating(modelBuilder);
+            modelBuilder.ApplyConfigurationsFromAssembly(typeof(AppDbContext).Assembly);
         }
     }
 }

@@ -35,7 +35,7 @@ namespace EventsWebApp.Infrastructure.Repositories
             _mapper = mapper;
             _userManager = userManager;
             _roleManager = roleManager;
-            _secretKey = configuration.GetSection("ApiSettings:Secret").Value
+            _secretKey = configuration.GetSection("Jwt:Key").Value
     ?? throw new ArgumentNullException("Secret key is missing");
         }
 

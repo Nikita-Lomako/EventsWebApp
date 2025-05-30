@@ -9,13 +9,40 @@ namespace EventsWebApp.Core.Models
 {
     public class APIResponse
     {
-        public APIResponse()
-        {
-            ErrorMessages = new List<string>();
-        }
         public bool IsSuccess { get; set; }
-        public Object Result { get; set; }
-        public HttpStatusCode StatusCode { get; set; }
-        public List<string> ErrorMessages { get; set; }
+        public object? Result { get; set; }
+        public string? ErrorMessage { get; set; }
+        public List<string>? ErrorMessages { get; set; }
+        public int StatusCode { get; set; }
+
+        public static APIResponse Success(object? result = null, int statusCode = 200)
+        {
+            return new APIResponse
+            {
+                IsSuccess = true,
+                Result = result,
+                StatusCode = statusCode
+            };
+        }
+
+        public static APIResponse Error(string errorMessage, int statusCode = 400)
+        {
+            return new APIResponse
+            {
+                IsSuccess = false,
+                ErrorMessage = errorMessage,
+                StatusCode = statusCode
+            };
+        }
+
+        public static APIResponse Error(List<string> errorMessages, int statusCode = 400)
+        {
+            return new APIResponse
+            {
+                IsSuccess = false,
+                ErrorMessages = errorMessages,
+                StatusCode = statusCode
+            };
+        }
     }
 }

@@ -1,6 +1,7 @@
 using EventsWebApp.Core;
 using EventsWebApp.Core.IRepositories;
-using EventsWebApp.Core.Models;
+using EventsWebApp.Core.Validation;
+using EventsWebApp.Infrastructure;
 using EventsWebApp.Infrastructure.Data;
 using EventsWebApp.Infrastructure.Repositories;
 using EventsWebApp.MinimalAPI.Endpoints;
@@ -8,24 +9,18 @@ using FluentValidation;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using System;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+// Add services to the container
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddIdentity<AppUser, IdentityRole>()
-    .AddDefaultTokenProviders()
-    .AddEntityFrameworkStores<AppDbContext>();
-
-builder.Services.AddSwaggerGen(option =>
+builder.Services.AddSwaggerGen(c =>
 {
-    // Определение схемы безопасности
-    option.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    c.SwaggerDoc("v1", new OpenApiInfo { Title = "Events Web API", Version = "v1" });
+    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
         Description =
         "JWT Authorization header using the Bearer scheme. \r\n\r\n " +
@@ -36,8 +31,7 @@ builder.Services.AddSwaggerGen(option =>
         Type = SecuritySchemeType.ApiKey,
         Scheme = "Bearer"
     });
-    // Требование безопасности для операций
-    option.AddSecurityRequirement(new OpenApiSecurityRequirement()
+    c.AddSecurityRequirement(new OpenApiSecurityRequirement
     {
         {
             new OpenApiSecurityScheme
@@ -56,53 +50,82 @@ builder.Services.AddSwaggerGen(option =>
     });
 });
 
-//builder.Services.AddScoped<ICouponRepository, CouponRepository>();
-builder.Services.AddScoped<IAuthRepository, AuthRepository>();
-
+// Add DbContext
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-builder.Services.AddAutoMapper(typeof(MappingConfig));
-builder.Services.AddValidatorsFromAssemblyContaining<Program>();
+// Add Identity
+builder.Services.AddIdentity<AppUser, IdentityRole>()
+    .AddEntityFrameworkStores<AppDbContext>()
+    .AddDefaultTokenProviders();
 
-builder.Services.AddAuthentication(x =>
+// Add Authentication
+builder.Services.AddAuthentication(options =>
 {
-    // Настройка схем аутентификации по умолчанию
-    x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-    x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-}).AddJwtBearer(x => // Добавление обработчика JWT Bearer
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+.AddJwtBearer(options =>
 {
-    x.RequireHttpsMetadata = false; // Разрешить HTTP в разработке (в продакшене true)
-    x.SaveToken = true; // Сохранять токен в HttpContext после успешной аутентификации
-    x.TokenValidationParameters = new TokenValidationParameters
+    options.RequireHttpsMetadata = false; // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ HTTP пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ (пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ true)
+    options.SaveToken = true; // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅ HttpContext пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+    options.TokenValidationParameters = new TokenValidationParameters
     {
-        ValidateIssuerSigningKey = true, // Проверять подпись токена
-        // Получение секретного ключа из конфигурации
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(
-            builder.Configuration.GetValue<string>("ApiSettings:Secret"))),
-        ValidateIssuer = false, // Не проверять издателя
-        ValidateAudience = false // Не проверять аудиторию
+        ValidateIssuer = false,
+        ValidateAudience = false,
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+        IssuerSigningKey = new SymmetricSecurityKey(
+            Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
     };
 });
+
+// Add Authorization
 builder.Services.AddAuthorization(options =>
 {
-    options.AddPolicy("AdminOnly", policy => policy.RequireRole("admin"));
-}); // Добавление сервисов авторизации
+    options.AddPolicy("AdminOnly", policy =>
+        policy.RequireRole("Admin"));
+});
+
+// Add AutoMapper
+builder.Services.AddAutoMapper(typeof(MappingConfig));
+
+// Add Repositories
+builder.Services.AddScoped<IEventRepository, EventRepository>();
+builder.Services.AddScoped<IParticipantRepository, ParticipantRepository>();
+
+// Add Validators
+builder.Services.AddScoped<IValidator<EventCreateDto>, EventCreateDtoValidator>();
+builder.Services.AddScoped<IValidator<EventUpdateDto>, EventUpdateDtoValidator>();
+builder.Services.AddScoped<IValidator<ParticipantCreateDto>, ParticipantCreateDtoValidator>();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+// Configure the HTTP request pipeline
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-app.UseAuthentication(); // 1.Распознает пользователя по токену
-app.UseAuthorization(); // 2.Проверяет права доступа к ресурсам
-
-//app.ConfigureCouponEndpoints();
-app.ConfigureAuthEndpoints();
 
 app.UseHttpsRedirection();
 
+app.UseAuthentication();
+app.UseAuthorization();
+
+// Map endpoints
+app.MapEventEndpoints();
+app.MapParticipantEndpoints();
+
+// Seed data
+if (app.Environment.IsDevelopment())
+{
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    var db = services.GetRequiredService<AppDbContext>();
+    db.Database.Migrate();
+    db.Seed();
+}
+}
 app.Run();
