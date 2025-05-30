@@ -24,80 +24,46 @@ namespace EventsWebApp.MinimalAPI.Endpoints
                 .Produces<APIResponse>(StatusCodes.Status400BadRequest);
         }
 
-        private static async Task<IResult> Login(
-            IAuthRepository _authRepo,
+        private async static Task<IResult> Login(IAuthRepository _authRepo,
             [FromBody] LoginRequestDTO model)
         {
-            if (model == null)
-            {
-                return Results.BadRequest(new APIResponse 
-                { 
-                    IsSuccess = false, 
-                    StatusCode = (int)HttpStatusCode.BadRequest,
-                    ErrorMessages = new List<string> { "Invalid request data" }
-                });
-            }
+            APIResponse response = new() { IsSuccess = false, StatusCode = HttpStatusCode.BadRequest };
 
             var loginResponse = await _authRepo.Login(model);
             if (loginResponse == null)
             {
-                return Results.BadRequest(new APIResponse 
-                { 
-                    IsSuccess = false, 
-                    StatusCode = (int)HttpStatusCode.BadRequest,
-                    ErrorMessages = new List<string> { "Username or password is incorrect" }
-                });
+                response.ErrorMessages.Add("Username or password is incorrect");
+                return Results.BadRequest(response);
             }
+            response.Result = loginResponse;
+            response.IsSuccess = true;
+            response.StatusCode = HttpStatusCode.OK;
 
-            return Results.Ok(new APIResponse 
-            { 
-                IsSuccess = true, 
-                StatusCode = (int)HttpStatusCode.OK,
-                Result = loginResponse
-            });
+            return Results.Ok(response);
         }
 
-        private static async Task<IResult> Register(
-            IAuthRepository _authRepo,
-            [FromBody] RegistrationRequestDto model)
+        private async static Task<IResult> Register(IAuthRepository _authRepo,
+           [FromBody] RegistrationRequestDto model)
         {
-            if (model == null)
-            {
-                return Results.BadRequest(new APIResponse 
-                { 
-                    IsSuccess = false, 
-                    StatusCode = (int)HttpStatusCode.BadRequest,
-                    ErrorMessages = new List<string> { "Invalid request data" }
-                });
-            }
+            APIResponse response = new() { IsSuccess = false, StatusCode = HttpStatusCode.BadRequest };
 
-            if (!_authRepo.IsUniqueUser(model.Email))
+            bool iFUsernameIsUnique = _authRepo.IsUniqueUser(model.Email);
+            if (!iFUsernameIsUnique)
             {
-                return Results.BadRequest(new APIResponse 
-                { 
-                    IsSuccess = false, 
-                    StatusCode = (int)HttpStatusCode.BadRequest,
-                    ErrorMessages = new List<string> { "Username already exists" }
-                });
+                response.ErrorMessages.Add("Username already exists");
+                return Results.BadRequest(response);
             }
-
             var registerResponse = await _authRepo.Register(model);
-            if (registerResponse == null)
+            if (registerResponse == null || string.IsNullOrEmpty(registerResponse.Email))
             {
-                return Results.BadRequest(new APIResponse 
-                { 
-                    IsSuccess = false, 
-                    StatusCode = (int)HttpStatusCode.BadRequest,
-                    ErrorMessages = new List<string> { "Registration failed. Please check provided information." }
-                });
+                response.ErrorMessages.Add("Registration failed. Please check provided information.");
+                return Results.BadRequest(response);
             }
 
-            return Results.Ok(new APIResponse 
-            { 
-                IsSuccess = true, 
-                StatusCode = (int)HttpStatusCode.OK,
-                Result = registerResponse
-            });
+            response.IsSuccess = true;
+            response.StatusCode = HttpStatusCode.OK;
+
+            return Results.Ok(response);
         }
     }
 }

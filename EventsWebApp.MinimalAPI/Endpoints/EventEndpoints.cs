@@ -61,16 +61,9 @@ namespace EventsWebApp.MinimalAPI.Endpoints
             IEventRepository eventRepository,
             IMapper mapper)
         {
-            try
-            {
-                var events = await eventRepository.GetAllAsync();
-                var eventDtos = mapper.Map<List<EventDto>>(events);
-                return Results.Ok(APIResponse.Success(eventDtos));
-            }
-            catch (Exception ex)
-            {
-                return Results.BadRequest(APIResponse.Error(ex.Message));
-            }
+            var events = await eventRepository.GetAllAsync();
+            var eventDtos = mapper.Map<List<EventDto>>(events);
+            return Results.Ok(eventDtos);
         }
 
         private static async Task<IResult> GetEventById(

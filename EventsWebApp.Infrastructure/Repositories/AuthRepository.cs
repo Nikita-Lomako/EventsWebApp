@@ -48,7 +48,7 @@ namespace EventsWebApp.Infrastructure.Repositories
         public async Task<LoginResponseDTO?> Login(LoginRequestDTO loginRequestDTO)
         {
             var user = await _db.AppUsers.SingleOrDefaultAsync(
-                x => x.UserName == loginRequestDTO.UserName);
+                x => x.UserName == loginRequestDTO.Email);
 
             if (user == null || !await _userManager.CheckPasswordAsync(user, loginRequestDTO.Password))
                 return null;
@@ -57,7 +57,7 @@ namespace EventsWebApp.Infrastructure.Repositories
 
             var claims = new List<Claim>
             {
-                new Claim(ClaimTypes.Name, user.UserName ?? string.Empty)
+                new Claim(ClaimTypes.Email, user.UserName ?? string.Empty)
             };
 
             foreach (var role in roles)
@@ -113,7 +113,7 @@ namespace EventsWebApp.Infrastructure.Repositories
                 await _roleManager.CreateAsync(new IdentityRole("admin"));
                 await _roleManager.CreateAsync(new IdentityRole("user"));
             }
-            await _userManager.AddToRoleAsync(userobj, "user");
+            await _userManager.AddToRoleAsync(userobj, "admin");
 
             var user = _db.AppUsers.FirstOrDefault(u => u.UserName == requestDTO.Email);
             return user != null ? _mapper.Map<UserDto>(user) : null;
