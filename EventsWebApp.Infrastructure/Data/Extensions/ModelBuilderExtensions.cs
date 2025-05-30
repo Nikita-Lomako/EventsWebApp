@@ -82,11 +82,13 @@ namespace EventsWebApp.Infrastructure.Data.Extensions
                 NormalizedUserName = "ADMIN@EXAMPLE.COM",
                 NormalizedEmail = "ADMIN@EXAMPLE.COM",
                 EmailConfirmed = true,
-                SecurityStamp = Guid.NewGuid().ToString("D")
+                SecurityStamp = "00000000-0000-0000-0000-000000000000",
+                ConcurrencyStamp = "00000000-0000-0000-0000-000000000000"
             };
 
             var passwordHasher = new PasswordHasher<AppUser>();
-            adminUser.PasswordHash = passwordHasher.HashPassword(adminUser, "Admin123!");
+            adminUser.PasswordHash = "AQAAAAEAACcQAAAAEPnMfYtRO1v3xtztKfGCMDM8O5rfMw4cv/MX6us1L5PH+vbFg7MrrqIhSoSbmUPzvw==";
+
 
             modelBuilder.Entity<AppUser>().HasData(adminUser);
 
@@ -104,9 +106,9 @@ namespace EventsWebApp.Infrastructure.Data.Extensions
                 new Event
                 {
                     Id = 1,
-                    Title = "Tech Conference 2024",
+                    Title = "Tech Conference 2025",
                     Description = "Annual technology conference featuring the latest innovations and industry leaders.",
-                    DateTime = DateTime.UtcNow.AddMonths(2),
+                    DateTime = new DateTime(2025, 7, 30, 10, 0, 0, DateTimeKind.Utc),
                     Venue = "Convention Center, New York",
                     Category = "Technology",
                     MaxParticipants = 50,
@@ -117,7 +119,7 @@ namespace EventsWebApp.Infrastructure.Data.Extensions
                     Id = 2,
                     Title = "Startup Networking Mixer",
                     Description = "Networking event for entrepreneurs and startup enthusiasts.",
-                    DateTime = DateTime.UtcNow.AddMonths(1),
+                    DateTime = new DateTime(2025, 6, 20, 18, 30, 0, DateTimeKind.Utc),
                     Venue = "Innovation Hub, San Francisco",
                     Category = "Networking",
                     MaxParticipants = 2,

@@ -220,15 +220,15 @@ namespace EventsWebApp.Infrastructure.Migrations
             migrationBuilder.InsertData(
                 table: "AspNetUsers",
                 columns: new[] { "Id", "AccessFailedCount", "ConcurrencyStamp", "Email", "EmailConfirmed", "LockoutEnabled", "LockoutEnd", "NormalizedEmail", "NormalizedUserName", "PasswordHash", "PhoneNumber", "PhoneNumberConfirmed", "SecurityStamp", "TwoFactorEnabled", "UserName" },
-                values: new object[] { new Guid("00000000-0000-0000-0000-000000000001"), 0, "34d978fa-8701-47fd-9d00-e58d775ec610", "admin@example.com", true, false, null, "ADMIN@EXAMPLE.COM", "ADMIN@EXAMPLE.COM", "AQAAAAIAAYagAAAAEA2LSY/X4lLguXVPr5O6mhOb2mnSNzgA7kUKhaIbfrsXYd3WUshJdGfi88EpD/sJNA==", null, false, "8bb32251-a144-4407-b843-a957df81d2c8", false, "admin@example.com" });
+                values: new object[] { new Guid("00000000-0000-0000-0000-000000000001"), 0, "00000000-0000-0000-0000-000000000000", "admin@example.com", true, false, null, "ADMIN@EXAMPLE.COM", "ADMIN@EXAMPLE.COM", "AQAAAAEAACcQAAAAEPnMfYtRO1v3xtztKfGCMDM8O5rfMw4cv/MX6us1L5PH+vbFg7MrrqIhSoSbmUPzvw==", null, false, "00000000-0000-0000-0000-000000000000", false, "admin@example.com" });
 
             migrationBuilder.InsertData(
                 table: "Events",
                 columns: new[] { "Id", "Category", "DateTime", "Description", "ImageUrl", "MaxParticipants", "Title", "Venue" },
                 values: new object[,]
                 {
-                    { 1, "Technology", new DateTime(2025, 7, 30, 15, 53, 19, 6, DateTimeKind.Utc).AddTicks(5530), "Annual technology conference featuring the latest innovations and industry leaders.", "https://files.energomera.ru/files/f1f837fb917fb8d55fa19cf656b82116.jpg", 50, "Tech Conference 2024", "Convention Center, New York" },
-                    { 2, "Networking", new DateTime(2025, 6, 30, 15, 53, 19, 6, DateTimeKind.Utc).AddTicks(6792), "Networking event for entrepreneurs and startup enthusiasts.", "https://marketing.hse.ru/data/2022/07/11/1634985082/iStock-1213693378.jpg", 2, "Startup Networking Mixer", "Innovation Hub, San Francisco" }
+                    { 1, "Technology", new DateTime(2025, 7, 30, 10, 0, 0, 0, DateTimeKind.Utc), "Annual technology conference featuring the latest innovations and industry leaders.", "https://files.energomera.ru/files/f1f837fb917fb8d55fa19cf656b82116.jpg", 50, "Tech Conference 2025", "Convention Center, New York" },
+                    { 2, "Networking", new DateTime(2025, 6, 20, 18, 30, 0, 0, DateTimeKind.Utc), "Networking event for entrepreneurs and startup enthusiasts.", "https://marketing.hse.ru/data/2022/07/11/1634985082/iStock-1213693378.jpg", 2, "Startup Networking Mixer", "Innovation Hub, San Francisco" }
                 });
 
             migrationBuilder.InsertData(

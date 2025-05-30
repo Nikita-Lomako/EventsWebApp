@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace EventsWebApp.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250530155319_InitialCreate")]
+    [Migration("20250530183123_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -97,15 +97,15 @@ namespace EventsWebApp.Infrastructure.Migrations
                         {
                             Id = new Guid("00000000-0000-0000-0000-000000000001"),
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "34d978fa-8701-47fd-9d00-e58d775ec610",
+                            ConcurrencyStamp = "00000000-0000-0000-0000-000000000000",
                             Email = "admin@example.com",
                             EmailConfirmed = true,
                             LockoutEnabled = false,
                             NormalizedEmail = "ADMIN@EXAMPLE.COM",
                             NormalizedUserName = "ADMIN@EXAMPLE.COM",
-                            PasswordHash = "AQAAAAIAAYagAAAAEA2LSY/X4lLguXVPr5O6mhOb2mnSNzgA7kUKhaIbfrsXYd3WUshJdGfi88EpD/sJNA==",
+                            PasswordHash = "AQAAAAEAACcQAAAAEPnMfYtRO1v3xtztKfGCMDM8O5rfMw4cv/MX6us1L5PH+vbFg7MrrqIhSoSbmUPzvw==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "8bb32251-a144-4407-b843-a957df81d2c8",
+                            SecurityStamp = "00000000-0000-0000-0000-000000000000",
                             TwoFactorEnabled = false,
                             UserName = "admin@example.com"
                         });
@@ -157,18 +157,18 @@ namespace EventsWebApp.Infrastructure.Migrations
                         {
                             Id = 1,
                             Category = "Technology",
-                            DateTime = new DateTime(2025, 7, 30, 15, 53, 19, 6, DateTimeKind.Utc).AddTicks(5530),
+                            DateTime = new DateTime(2025, 7, 30, 10, 0, 0, 0, DateTimeKind.Utc),
                             Description = "Annual technology conference featuring the latest innovations and industry leaders.",
                             ImageUrl = "https://files.energomera.ru/files/f1f837fb917fb8d55fa19cf656b82116.jpg",
                             MaxParticipants = 50,
-                            Title = "Tech Conference 2024",
+                            Title = "Tech Conference 2025",
                             Venue = "Convention Center, New York"
                         },
                         new
                         {
                             Id = 2,
                             Category = "Networking",
-                            DateTime = new DateTime(2025, 6, 30, 15, 53, 19, 6, DateTimeKind.Utc).AddTicks(6792),
+                            DateTime = new DateTime(2025, 6, 20, 18, 30, 0, 0, DateTimeKind.Utc),
                             Description = "Networking event for entrepreneurs and startup enthusiasts.",
                             ImageUrl = "https://marketing.hse.ru/data/2022/07/11/1634985082/iStock-1213693378.jpg",
                             MaxParticipants = 2,

@@ -22,8 +22,6 @@ namespace EventsWebApp.Infrastructure.Data
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
-            // Применяем конфигурации из текущей сборки
-            modelBuilder.ApplyConfigurationsFromAssembly(typeof(AppDbContext).Assembly);
 
             // Добавляем кастомную конфигурацию сущностей
             modelBuilder.ConfigureEntities();
