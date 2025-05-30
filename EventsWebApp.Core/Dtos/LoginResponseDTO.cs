@@ -8,7 +8,7 @@ namespace EventsWebApp.Core.Dtos
 {
     public class LoginResponseDTO
     {
-        public UserDTO User { get; set; }
+        public required UserDto User { get; set; }
         public string Token { get; set; } = string.Empty;
     }
 }

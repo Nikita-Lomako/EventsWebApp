@@ -11,6 +11,6 @@ namespace EventsWebApp.Core.IRepositories
     {
         bool IsUniqueUser(string username);
         Task<LoginResponseDTO> Login(LoginRequestDTO loginRequestDTO);
-        Task<UserDTO> Register(RegistrationRequestDTO requestDTO);
+        Task<UserDto> Register(RegistrationRequestDto requestDTO);
     }
 }

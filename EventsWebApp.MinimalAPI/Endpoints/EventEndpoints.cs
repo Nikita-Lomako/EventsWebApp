@@ -1,3 +1,4 @@
+using AutoMapper;
 using EventsWebApp.Core.Dtos;
 using EventsWebApp.Core.IRepositories;
 using EventsWebApp.Core.Models;
@@ -77,7 +78,7 @@ namespace EventsWebApp.MinimalAPI.Endpoints
             IEventRepository eventRepository,
             IMapper mapper)
         {
-            var eventEntity = await eventRepository.GetByIdAsync(id);
+            var eventEntity = await eventRepository.GetAsync(id);
             if (eventEntity == null)
                 return Results.NotFound();
 
@@ -86,8 +87,7 @@ namespace EventsWebApp.MinimalAPI.Endpoints
         }
 
         private static async Task<IResult> SearchEvents(
-            [FromQuery] DateTime? startDate,
-            [FromQuery] DateTime? endDate,
+            [FromQuery] DateTime? date,
             [FromQuery] string? location,
             [FromQuery] string? category,
             IEventRepository eventRepository,
@@ -95,8 +95,8 @@ namespace EventsWebApp.MinimalAPI.Endpoints
         {
             IEnumerable<Event> events;
 
-            if (startDate.HasValue && endDate.HasValue)
-                events = await eventRepository.GetByDateRangeAsync(startDate.Value, endDate.Value);
+            if (date.HasValue)
+                events = await eventRepository.GetByDateAsync(date.Value);
             else if (!string.IsNullOrEmpty(location))
                 events = await eventRepository.GetByLocationAsync(location);
             else if (!string.IsNullOrEmpty(category))
@@ -119,7 +119,7 @@ namespace EventsWebApp.MinimalAPI.Endpoints
                 return Results.BadRequest(validationResult.Errors);
 
             var eventEntity = mapper.Map<Event>(eventDto);
-            eventEntity = await eventRepository.CreateAsync(eventEntity);
+            await eventRepository.CreateAsync(eventEntity);
             var createdEventDto = mapper.Map<EventDto>(eventEntity);
 
             return Results.Created($"/api/events/{createdEventDto.Id}", createdEventDto);
@@ -136,12 +136,12 @@ namespace EventsWebApp.MinimalAPI.Endpoints
             if (!validationResult.IsValid)
                 return Results.BadRequest(validationResult.Errors);
 
-            var existingEvent = await eventRepository.GetByIdAsync(id);
+            var existingEvent = await eventRepository.GetAsync(id);
             if (existingEvent == null)
                 return Results.NotFound();
 
             mapper.Map(eventDto, existingEvent);
-            existingEvent = await eventRepository.UpdateAsync(existingEvent);
+            await eventRepository.UpdateAsync(existingEvent);
             var updatedEventDto = mapper.Map<EventDto>(existingEvent);
 
             return Results.Ok(updatedEventDto);
@@ -151,7 +151,7 @@ namespace EventsWebApp.MinimalAPI.Endpoints
             int id,
             IEventRepository eventRepository)
         {
-            var existingEvent = await eventRepository.GetByIdAsync(id);
+            var existingEvent = await eventRepository.GetAsync(id);
             if (existingEvent == null)
                 return Results.NotFound();
 
@@ -159,4 +159,4 @@ namespace EventsWebApp.MinimalAPI.Endpoints
             return Results.NoContent();
         }
     }
-} 
+}

@@ -2,6 +2,7 @@ using EventsWebApp.Core.IRepositories;
 using EventsWebApp.Core.Models;
 using EventsWebApp.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
+using System;
 
 namespace EventsWebApp.Infrastructure.Repositories
 {
@@ -14,36 +15,36 @@ namespace EventsWebApp.Infrastructure.Repositories
             _db = db;
         }
 
-        public async Task<IEnumerable<Event>> GetAllAsync()
+        public async Task<ICollection<Event>> GetAllAsync()
         {
             return await _db.Events
                 .Include(e => e.Participants)
                 .ToListAsync();
         }
 
-        public async Task<Event?> GetByIdAsync(int id)
+        public async Task<Event?> GetAsync(int id)
         {
             return await _db.Events
                 .Include(e => e.Participants)
                 .FirstOrDefaultAsync(e => e.Id == id);
         }
 
-        public async Task<Event?> GetByTitleAsync(string title)
+        public async Task<Event?> GetAsync(string title)
         {
             return await _db.Events
                 .Include(e => e.Participants)
                 .FirstOrDefaultAsync(e => e.Title == title);
         }
 
-        public async Task<IEnumerable<Event>> GetByDateRangeAsync(DateTime startDate, DateTime endDate)
+        public async Task<ICollection<Event>> GetByDateAsync(DateTime date)
         {
             return await _db.Events
                 .Include(e => e.Participants)
-                .Where(e => e.DateTime >= startDate && e.DateTime <= endDate)
+                .Where(e => e.DateTime.Date == date.Date)
                 .ToListAsync();
         }
 
-        public async Task<IEnumerable<Event>> GetByLocationAsync(string location)
+        public async Task<ICollection<Event>> GetByLocationAsync(string location)
         {
             return await _db.Events
                 .Include(e => e.Participants)
@@ -51,7 +52,7 @@ namespace EventsWebApp.Infrastructure.Repositories
                 .ToListAsync();
         }
 
-        public async Task<IEnumerable<Event>> GetByCategoryAsync(string category)
+        public async Task<ICollection<Event>> GetByCategoryAsync(string category)
         {
             return await _db.Events
                 .Include(e => e.Participants)
@@ -59,29 +60,37 @@ namespace EventsWebApp.Infrastructure.Repositories
                 .ToListAsync();
         }
 
-        public async Task<Event> CreateAsync(Event entity)
+        public async Task CreateAsync(Event evt)
         {
-            await _db.Events.AddAsync(entity);
+            await _db.Events.AddAsync(evt);
             await _db.SaveChangesAsync();
-            return entity;
         }
 
-        public async Task<Event> UpdateAsync(Event entity)
+        public async Task UpdateAsync(Event evt)
         {
-            _db.Events.Update(entity);
+            _db.Events.Update(evt);
             await _db.SaveChangesAsync();
-            return entity;
         }
 
-        public async Task RemoveAsync(Event entity)
+        public async Task RemoveAsync(Event evt)
         {
-            _db.Events.Remove(entity);
+            _db.Events.Remove(evt);
+            await _db.SaveChangesAsync();
+        }
+
+        public async Task SaveAsync()
+        {
             await _db.SaveChangesAsync();
         }
 
         public async Task<bool> ExistsAsync(int id)
         {
             return await _db.Events.AnyAsync(e => e.Id == id);
+        }
+
+        public async Task<bool> ExistsAsync(string title)
+        {
+            return await _db.Events.AnyAsync(e => e.Title == title);
         }
 
         public async Task<int> GetParticipantsCountAsync(int eventId)

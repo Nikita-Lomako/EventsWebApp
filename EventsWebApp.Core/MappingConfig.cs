@@ -15,11 +15,10 @@ namespace EventsWebApp.Core
         {
             // Event mappings
             CreateMap<Event, EventDto>().ReverseMap()
-                .ForMember(dest => dest.CurrentParticipantsCount,
-                    opt => opt.MapFrom(src => src.Participants.Count));
+                .ForMember(dest => dest.Participants.Count,
+                    opt => opt.MapFrom(src => src.CurrentParticipantsCount));
             CreateMap<EventCreateDto, Event>().ReverseMap();
-            CreateMap<EventUpdateDto, Event>().ReverseMap()
-                .ForMember(dest => dest.LastUpdated, opt => opt.MapFrom(src => DateTime.Now));
+            CreateMap<EventUpdateDto, Event>().ReverseMap();
 
             // Participant mappings
             CreateMap<Participant, ParticipantDto>().ReverseMap();

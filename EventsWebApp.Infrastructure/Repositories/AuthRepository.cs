@@ -91,22 +91,21 @@ namespace EventsWebApp.Infrastructure.Repositories
             // Формирование ответа
             return new LoginResponseDTO
             {
-                User = _mapper.Map<UserDTO>(user), // Информация о пользователе
+                User = _mapper.Map<UserDto>(user), // Информация о пользователе
                 Token = tokenHandler.WriteToken(token) // Преобразование в строку формата JWT
             };
         }
 
-        public async Task<UserDTO> Register(RegistrationRequestDTO requestDTO)
+        public async Task<UserDto> Register(RegistrationRequestDto requestDTO)
         {
             AppUser userobj = new()
             {
-                UserName = requestDTO.UserName,
-                Name = requestDTO.Name,
-                NormalizedEmail = requestDTO.UserName.ToUpper(),
-                Email = requestDTO.UserName,
+                UserName = requestDTO.Email,
+                NormalizedEmail = requestDTO.Email.ToUpper(),
+                Email = requestDTO.Email,
             };
             // Проверка, существует ли пользователь
-            if (await _userManager.FindByNameAsync(requestDTO.UserName) != null)
+            if (await _userManager.FindByNameAsync(requestDTO.Email) != null)
             {
                 return null; // Username not unique
             }
@@ -126,8 +125,8 @@ namespace EventsWebApp.Infrastructure.Repositories
             }
             await _userManager.AddToRoleAsync(userobj, "admin");
 
-            var user = _db.AppUsers.FirstOrDefault(u => u.UserName == requestDTO.UserName);
-            return _mapper.Map<UserDTO>(user);
+            var user = _db.AppUsers.FirstOrDefault(u => u.UserName == requestDTO.Email);
+            return _mapper.Map<UserDto>(user);
         }
     }
 }

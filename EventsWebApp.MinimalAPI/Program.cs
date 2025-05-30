@@ -1,5 +1,7 @@
 using EventsWebApp.Core;
+using EventsWebApp.Core.Dtos;
 using EventsWebApp.Core.IRepositories;
+using EventsWebApp.Core.Models;
 using EventsWebApp.Core.Validation;
 using EventsWebApp.Infrastructure;
 using EventsWebApp.Infrastructure.Data;
@@ -117,15 +119,4 @@ app.UseAuthorization();
 app.MapEventEndpoints();
 app.MapParticipantEndpoints();
 
-// Seed data
-if (app.Environment.IsDevelopment())
-{
-using (var scope = app.Services.CreateScope())
-{
-    var services = scope.ServiceProvider;
-    var db = services.GetRequiredService<AppDbContext>();
-    db.Database.Migrate();
-    db.Seed();
-}
-}
 app.Run();

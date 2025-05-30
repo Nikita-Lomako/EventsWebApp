@@ -1,3 +1,4 @@
+using AutoMapper;
 using EventsWebApp.Core.Dtos;
 using EventsWebApp.Core.IRepositories;
 using EventsWebApp.Core.Models;
@@ -5,6 +6,7 @@ using EventsWebApp.Core.Validation;
 using FluentValidation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System;
 using System.Security.Claims;
 
 namespace EventsWebApp.MinimalAPI.Endpoints
@@ -73,12 +75,12 @@ namespace EventsWebApp.MinimalAPI.Endpoints
             IMapper mapper,
             ClaimsPrincipal user)
         {
-            var participant = await participantRepository.GetByIdAsync(id);
+            var participant = await participantRepository.GetAsync(id);
             if (participant == null)
                 return Results.NotFound();
 
-            // Only allow access if user is admin or the participant themselves
-            if (!user.IsInRole("Admin") && participant.UserId != user.FindFirstValue(ClaimTypes.NameIdentifier))
+            var userId = Guid.Parse(user.FindFirstValue(ClaimTypes.NameIdentifier) ?? throw new InvalidOperationException("User ID not found"));
+            if (!user.IsInRole("Admin") && participant.UserId != userId)
                 return Results.Forbid();
 
             var participantDto = mapper.Map<ParticipantDto>(participant);
@@ -100,7 +102,7 @@ namespace EventsWebApp.MinimalAPI.Endpoints
             IMapper mapper,
             ClaimsPrincipal user)
         {
-            var userId = user.FindFirstValue(ClaimTypes.NameIdentifier);
+            var userId = Guid.Parse(user.FindFirstValue(ClaimTypes.NameIdentifier) ?? throw new InvalidOperationException("User ID not found"));
             var participants = await participantRepository.GetByUserIdAsync(userId);
             var participantDtos = mapper.Map<List<ParticipantDto>>(participants);
             return Results.Ok(participantDtos);
@@ -118,25 +120,22 @@ namespace EventsWebApp.MinimalAPI.Endpoints
             if (!validationResult.IsValid)
                 return Results.BadRequest(validationResult.Errors);
 
-            // Check if event exists
             var eventExists = await eventRepository.ExistsAsync(participantDto.EventId);
             if (!eventExists)
                 return Results.NotFound("Event not found");
 
-            // Check if user is already registered
-            var userId = user.FindFirstValue(ClaimTypes.NameIdentifier);
+            var userId = Guid.Parse(user.FindFirstValue(ClaimTypes.NameIdentifier) ?? throw new InvalidOperationException("User ID not found"));
             var isRegistered = await participantRepository.IsUserRegisteredForEventAsync(userId, participantDto.EventId);
             if (isRegistered)
                 return Results.BadRequest("User is already registered for this event");
 
             var participant = mapper.Map<Participant>(participantDto);
             participant.UserId = userId;
-            participant.RegistrationDate = DateTime.Now;
+            participant.RegistrationDate = DateTime.UtcNow;
 
-            participant = await participantRepository.CreateAsync(participant);
-            var participantDto = mapper.Map<ParticipantDto>(participant);
-
-            return Results.Created($"/api/participants/{participantDto.Id}", participantDto);
+            await participantRepository.CreateAsync(participant);
+            var result = mapper.Map<ParticipantDto>(participant);
+            return Results.Created($"/api/participants/{result.Id}", result);
         }
 
         private static async Task<IResult> CancelRegistration(
@@ -144,12 +143,12 @@ namespace EventsWebApp.MinimalAPI.Endpoints
             IParticipantRepository participantRepository,
             ClaimsPrincipal user)
         {
-            var participant = await participantRepository.GetByIdAsync(id);
+            var participant = await participantRepository.GetAsync(id);
             if (participant == null)
                 return Results.NotFound();
 
-            // Only allow cancellation if user is admin or the participant themselves
-            if (!user.IsInRole("Admin") && participant.UserId != user.FindFirstValue(ClaimTypes.NameIdentifier))
+            var userId = Guid.Parse(user.FindFirstValue(ClaimTypes.NameIdentifier) ?? throw new InvalidOperationException("User ID not found"));
+            if (!user.IsInRole("Admin") && participant.UserId != userId)
                 return Results.Forbid();
 
             await participantRepository.RemoveAsync(participant);

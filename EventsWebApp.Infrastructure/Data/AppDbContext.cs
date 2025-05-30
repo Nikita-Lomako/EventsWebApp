@@ -1,4 +1,5 @@
 ﻿using EventsWebApp.Core.Models;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -10,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace EventsWebApp.Infrastructure.Data
 {
-    public class AppDbContext : IdentityDbContext<AppUser>
+    public class AppDbContext : IdentityDbContext<AppUser, IdentityRole<Guid>, Guid>
     {
         public AppDbContext(DbContextOptions<AppDbContext> options)
             : base(options)

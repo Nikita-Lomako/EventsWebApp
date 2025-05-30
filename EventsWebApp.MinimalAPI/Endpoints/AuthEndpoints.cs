@@ -19,7 +19,7 @@ namespace EventsWebApp.MinimalAPI.Endpoints
             // Register
             app.MapPost("/api/register", Register)
                 .WithName("Register")
-                .Accepts<RegistrationRequestDTO>("application/json")
+                .Accepts<RegistrationRequestDto>("application/json")
                 .Produces<APIResponse>(StatusCodes.Status200OK)
                 .Produces<APIResponse>(StatusCodes.Status400BadRequest);
         }
@@ -27,7 +27,7 @@ namespace EventsWebApp.MinimalAPI.Endpoints
         private async static Task<IResult> Login(IAuthRepository _authRepo,
             [FromBody] LoginRequestDTO model)
         {
-            APIResponse response = new() { IsSuccess = false, StatusCode = HttpStatusCode.BadRequest };
+            APIResponse response = new() { IsSuccess = false, StatusCode = (int)HttpStatusCode.BadRequest };
 
             var loginResponse = await _authRepo.Login(model);
             if (loginResponse == null)
@@ -37,17 +37,17 @@ namespace EventsWebApp.MinimalAPI.Endpoints
             }
             response.Result = loginResponse;
             response.IsSuccess = true;
-            response.StatusCode = HttpStatusCode.OK;
+            response.StatusCode = (int)HttpStatusCode.OK;
 
             return Results.Ok(response);
         }
 
         private async static Task<IResult> Register(IAuthRepository _authRepo,
-           [FromBody] RegistrationRequestDTO model)
+           [FromBody] RegistrationRequestDto model)
         {
-            APIResponse response = new() { IsSuccess = false, StatusCode = HttpStatusCode.BadRequest };
+            APIResponse response = new() { IsSuccess = false, StatusCode = (int)HttpStatusCode.BadRequest };
 
-            bool iFUsernameIsUnique = _authRepo.IsUniqueUser(model.UserName);
+            bool iFUsernameIsUnique = _authRepo.IsUniqueUser(model.Email);
             if (!iFUsernameIsUnique)
             {
                 response.ErrorMessages.Add("Username already exists");
@@ -61,7 +61,7 @@ namespace EventsWebApp.MinimalAPI.Endpoints
             }
 
             response.IsSuccess = true;
-            response.StatusCode = HttpStatusCode.OK;
+            response.StatusCode = (int)HttpStatusCode.OK;
 
             return Results.Ok(response);
         }
