@@ -1,13 +1,9 @@
 ﻿using EventsWebApp.Core.Models;
+using EventsWebApp.Infrastructure.Data.Extensions;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection.Emit;
-using System.Text;
-using System.Threading.Tasks;
+
 
 namespace EventsWebApp.Infrastructure.Data
 {
@@ -26,7 +22,15 @@ namespace EventsWebApp.Infrastructure.Data
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+            // Применяем конфигурации из текущей сборки
             modelBuilder.ApplyConfigurationsFromAssembly(typeof(AppDbContext).Assembly);
+
+            // Добавляем кастомную конфигурацию сущностей
+            modelBuilder.ConfigureEntities();
+
+            // Добавляем начальные данные
+            modelBuilder.Seed();
+
         }
     }
 }

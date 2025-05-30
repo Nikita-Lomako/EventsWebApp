@@ -82,7 +82,7 @@ namespace EventsWebApp.Infrastructure.Data.Extensions
                 NormalizedUserName = "ADMIN@EXAMPLE.COM",
                 NormalizedEmail = "ADMIN@EXAMPLE.COM",
                 EmailConfirmed = true,
-                SecurityStamp = Guid.NewGuid().ToString()
+                SecurityStamp = Guid.NewGuid().ToString("D")
             };
 
             var passwordHasher = new PasswordHasher<AppUser>();
