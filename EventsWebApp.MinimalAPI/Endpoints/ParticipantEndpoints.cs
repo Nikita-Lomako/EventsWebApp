@@ -79,7 +79,7 @@ namespace EventsWebApp.MinimalAPI.Endpoints
             if (participant == null)
                 return Results.NotFound();
 
-            var userId = Guid.Parse(user.FindFirstValue(ClaimTypes.NameIdentifier) ?? throw new InvalidOperationException("User ID not found"));
+            var userId = user.FindFirstValue(ClaimTypes.NameIdentifier) ?? throw new InvalidOperationException("User ID not found");
             if (!user.IsInRole("Admin") && participant.UserId != userId)
                 return Results.Forbid();
 
@@ -102,7 +102,7 @@ namespace EventsWebApp.MinimalAPI.Endpoints
             IMapper mapper,
             ClaimsPrincipal user)
         {
-            var userId = Guid.Parse(user.FindFirstValue(ClaimTypes.NameIdentifier) ?? throw new InvalidOperationException("User ID not found"));
+            var userId = user.FindFirstValue(ClaimTypes.NameIdentifier) ?? throw new InvalidOperationException("User ID not found");
             var participants = await participantRepository.GetByUserIdAsync(userId);
             var participantDtos = mapper.Map<List<ParticipantDto>>(participants);
             return Results.Ok(participantDtos);
@@ -124,7 +124,7 @@ namespace EventsWebApp.MinimalAPI.Endpoints
             if (!eventExists)
                 return Results.NotFound("Event not found");
 
-            var userId = Guid.Parse(user.FindFirstValue(ClaimTypes.NameIdentifier) ?? throw new InvalidOperationException("User ID not found"));
+            var userId = user.FindFirstValue(ClaimTypes.NameIdentifier) ?? throw new InvalidOperationException("User ID not found");
             var isRegistered = await participantRepository.IsUserRegisteredForEventAsync(userId, participantDto.EventId);
             if (isRegistered)
                 return Results.BadRequest("User is already registered for this event");
@@ -147,7 +147,7 @@ namespace EventsWebApp.MinimalAPI.Endpoints
             if (participant == null)
                 return Results.NotFound();
 
-            var userId = Guid.Parse(user.FindFirstValue(ClaimTypes.NameIdentifier) ?? throw new InvalidOperationException("User ID not found"));
+            var userId = user.FindFirstValue(ClaimTypes.NameIdentifier) ?? throw new InvalidOperationException("User ID not found");
             if (!user.IsInRole("Admin") && participant.UserId != userId)
                 return Results.Forbid();
 

@@ -24,7 +24,7 @@ namespace EventsWebApp.Infrastructure.Repositories
         private readonly IMapper _mapper;
         private readonly UserManager<AppUser> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
-        private string _secretKey;
+        private readonly string _secretKey;
 
         public AuthRepository(AppDbContext db, IMapper mapper, IConfiguration configuration,
             UserManager<AppUser> userManager,
@@ -36,97 +36,87 @@ namespace EventsWebApp.Infrastructure.Repositories
             _userManager = userManager;
             _roleManager = roleManager;
             _secretKey = configuration.GetSection("Jwt:Key").Value
-    ?? throw new ArgumentNullException("Secret key is missing");
+                ?? throw new ArgumentNullException("Secret key is missing");
         }
 
         public bool IsUniqueUser(string username)
         {
             var user = _db.AppUsers.FirstOrDefault(x => x.UserName == username);
-
-            if (user == null)
-                return true;
-
-            return false;
+            return user == null;
         }
 
-        public async Task<LoginResponseDTO> Login(LoginRequestDTO loginRequestDTO)
+        public async Task<LoginResponseDTO?> Login(LoginRequestDTO loginRequestDTO)
         {
             var user = await _db.AppUsers.SingleOrDefaultAsync(
                 x => x.UserName == loginRequestDTO.UserName);
 
             if (user == null || !await _userManager.CheckPasswordAsync(user, loginRequestDTO.Password))
-                return null; // Пользователь не найден
+                return null;
 
             var roles = await _userManager.GetRolesAsync(user);
 
-            // ⬇️ Формируем список клеймов (claims)
             var claims = new List<Claim>
-    {
-        new Claim(ClaimTypes.Name, user.UserName)
-    };
+            {
+                new Claim(ClaimTypes.Name, user.UserName ?? string.Empty)
+            };
 
             foreach (var role in roles)
             {
                 claims.Add(new Claim(ClaimTypes.Role, role));
             }
 
-            // Создание JWT-токена
             var tokenHandler = new JwtSecurityTokenHandler();
             var key = Encoding.ASCII.GetBytes(_secretKey);
 
-            // Описание токена
             var tokenDescriptor = new SecurityTokenDescriptor
             {
-                // Утверждения (claims) о пользователе
                 Subject = new ClaimsIdentity(claims),
-                // Срок действия токена (7 дней)
                 Expires = DateTime.UtcNow.AddDays(7),
-                // Креденциалы для подписи
                 SigningCredentials = new SigningCredentials(
                     new SymmetricSecurityKey(key),
-                SecurityAlgorithms.HmacSha256Signature)
+                    SecurityAlgorithms.HmacSha256Signature)
             };
-            // Генерация токена
+
             var token = tokenHandler.CreateToken(tokenDescriptor);
-            // Формирование ответа
             return new LoginResponseDTO
             {
-                User = _mapper.Map<UserDto>(user), // Информация о пользователе
-                Token = tokenHandler.WriteToken(token) // Преобразование в строку формата JWT
+                User = _mapper.Map<UserDto>(user),
+                Token = tokenHandler.WriteToken(token)
             };
         }
 
-        public async Task<UserDto> Register(RegistrationRequestDto requestDTO)
+        public async Task<UserDto?> Register(RegistrationRequestDto requestDTO)
         {
             AppUser userobj = new()
             {
                 UserName = requestDTO.Email,
-                NormalizedEmail = requestDTO.Email.ToUpper(),
                 Email = requestDTO.Email,
+                NormalizedEmail = requestDTO.Email.ToUpper(),
+                NormalizedUserName = requestDTO.Email.ToUpper()
             };
-            // Проверка, существует ли пользователь
+
             if (await _userManager.FindByNameAsync(requestDTO.Email) != null)
             {
-                return null; // Username not unique
+                return null;
             }
 
             var result = await _userManager.CreateAsync(userobj, requestDTO.Password);
 
             if (!result.Succeeded)
             {
-                return null; // Creation failed
+                return null;
             }
 
-            // Создание ролей при необходимости
+            // Create roles if they don't exist
             if (!await _roleManager.RoleExistsAsync("admin"))
             {
                 await _roleManager.CreateAsync(new IdentityRole("admin"));
-                await _roleManager.CreateAsync(new IdentityRole("customer"));
+                await _roleManager.CreateAsync(new IdentityRole("user"));
             }
-            await _userManager.AddToRoleAsync(userobj, "admin");
+            await _userManager.AddToRoleAsync(userobj, "user");
 
             var user = _db.AppUsers.FirstOrDefault(u => u.UserName == requestDTO.Email);
-            return _mapper.Map<UserDto>(user);
+            return user != null ? _mapper.Map<UserDto>(user) : null;
         }
     }
 }

@@ -37,7 +37,7 @@ namespace EventsWebApp.Infrastructure.Repositories
                 .ToListAsync();
         }
 
-        public async Task<ICollection<Participant>> GetByUserIdAsync(Guid userId)
+        public async Task<ICollection<Participant>> GetByUserIdAsync(string userId)
         {
             return await _db.Participants
                 .Include(p => p.Event)
@@ -67,7 +67,7 @@ namespace EventsWebApp.Infrastructure.Repositories
             return await _db.Participants.AnyAsync(p => p.Id == id);
         }
 
-        public async Task<bool> IsUserRegisteredForEventAsync(Guid userId, int eventId)
+        public async Task<bool> IsUserRegisteredForEventAsync(string userId, int eventId)
         {
             return await _db.Participants
                 .AnyAsync(p => p.UserId == userId && p.EventId == eventId);

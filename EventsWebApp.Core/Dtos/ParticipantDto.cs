@@ -11,6 +11,6 @@ namespace EventsWebApp.Core.Dtos
         public string Email { get; set; } = string.Empty;
         public DateTime RegistrationDate { get; set; }
         public int EventId { get; set; }
-        public Guid UserId { get; set; }
+        public string UserId { get; set; } = string.Empty;
     }
 } 

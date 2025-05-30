@@ -28,7 +28,7 @@ namespace EventsWebApp.Core.Models
         [ForeignKey("EventId")]
         public Event Event { get; set; } = null!;
         
-        public Guid UserId { get; set; }
+        public string UserId { get; set; } = string.Empty;
         
         [ForeignKey("UserId")]
         public AppUser User { get; set; } = null!;

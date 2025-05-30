@@ -57,7 +57,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 // Add Identity
-builder.Services.AddIdentity<AppUser, IdentityRole<Guid>>()
+builder.Services.AddIdentity<AppUser, IdentityRole>()
     .AddEntityFrameworkStores<AppDbContext>()
     .AddDefaultTokenProviders();
 
@@ -69,8 +69,8 @@ builder.Services.AddAuthentication(options =>
 })
 .AddJwtBearer(options =>
 {
-    options.RequireHttpsMetadata = false; // ��������� HTTP � ���������� (� ���������� true)
-    options.SaveToken = true; // ��������� ����� � HttpContext ����� �������� ��������������
+    options.RequireHttpsMetadata = false;
+    options.SaveToken = true;
     options.TokenValidationParameters = new TokenValidationParameters
     {
         ValidateIssuer = false,
@@ -93,6 +93,7 @@ builder.Services.AddAuthorization(options =>
 builder.Services.AddAutoMapper(typeof(MappingConfig));
 
 // Add Repositories
+builder.Services.AddScoped<IAuthRepository, AuthRepository>();
 builder.Services.AddScoped<IEventRepository, EventRepository>();
 builder.Services.AddScoped<IParticipantRepository, ParticipantRepository>();
 
@@ -116,6 +117,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 // Map endpoints
+app.ConfigureAuthEndpoints();
 app.MapEventEndpoints();
 app.MapParticipantEndpoints();
 

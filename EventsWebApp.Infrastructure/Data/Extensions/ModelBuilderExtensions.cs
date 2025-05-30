@@ -42,6 +42,7 @@ namespace EventsWebApp.Infrastructure.Data.Extensions
                 entity.Property(p => p.Surname).IsRequired().HasMaxLength(50);
                 entity.Property(p => p.Email).IsRequired().HasMaxLength(100);
                 entity.Property(p => p.RegistrationDate).IsRequired();
+                entity.Property(p => p.UserId).IsRequired();
 
                 entity.HasOne(p => p.Event)
                     .WithMany(e => e.Participants)
@@ -57,50 +58,6 @@ namespace EventsWebApp.Infrastructure.Data.Extensions
 
         public static void Seed(this ModelBuilder modelBuilder)
         {
-            // Seed roles
-            modelBuilder.Entity<IdentityRole<Guid>>().HasData(
-                new IdentityRole<Guid>
-                {
-                    Id = Guid.Parse("00000000-0000-0000-0000-000000000001"),
-                    Name = "Admin",
-                    NormalizedName = "ADMIN"
-                },
-                new IdentityRole<Guid>
-                {
-                    Id = Guid.Parse("00000000-0000-0000-0000-000000000002"),
-                    Name = "User",
-                    NormalizedName = "USER"
-                }
-            );
-
-            // Seed admin user
-            var adminUser = new AppUser
-            {
-                Id = Guid.Parse("00000000-0000-0000-0000-000000000001"),
-                UserName = "admin@example.com",
-                Email = "admin@example.com",
-                NormalizedUserName = "ADMIN@EXAMPLE.COM",
-                NormalizedEmail = "ADMIN@EXAMPLE.COM",
-                EmailConfirmed = true,
-                SecurityStamp = "00000000-0000-0000-0000-000000000000",
-                ConcurrencyStamp = "00000000-0000-0000-0000-000000000000"
-            };
-
-            var passwordHasher = new PasswordHasher<AppUser>();
-            adminUser.PasswordHash = "AQAAAAEAACcQAAAAEPnMfYtRO1v3xtztKfGCMDM8O5rfMw4cv/MX6us1L5PH+vbFg7MrrqIhSoSbmUPzvw==";
-
-
-            modelBuilder.Entity<AppUser>().HasData(adminUser);
-
-            // Assign admin role to admin user
-            modelBuilder.Entity<IdentityUserRole<Guid>>().HasData(
-                new IdentityUserRole<Guid>
-                {
-                    UserId = Guid.Parse("00000000-0000-0000-0000-000000000001"),
-                    RoleId = Guid.Parse("00000000-0000-0000-0000-000000000001")
-                }
-            );
-
             // Seed sample events
             modelBuilder.Entity<Event>().HasData(
                 new Event

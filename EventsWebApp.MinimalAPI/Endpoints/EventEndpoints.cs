@@ -87,7 +87,7 @@ namespace EventsWebApp.MinimalAPI.Endpoints
         }
 
         private static async Task<IResult> SearchEvents(
-            [FromQuery] DateTime? date,
+            [FromQuery] string? date,
             [FromQuery] string? location,
             [FromQuery] string? category,
             IEventRepository eventRepository,
@@ -95,8 +95,8 @@ namespace EventsWebApp.MinimalAPI.Endpoints
         {
             IEnumerable<Event> events;
 
-            if (date.HasValue)
-                events = await eventRepository.GetByDateAsync(date.Value);
+            if (!string.IsNullOrEmpty(date) && DateTime.TryParse(date, out DateTime parsedDate))
+                events = await eventRepository.GetByDateAsync(parsedDate);
             else if (!string.IsNullOrEmpty(location))
                 events = await eventRepository.GetByLocationAsync(location);
             else if (!string.IsNullOrEmpty(category))
