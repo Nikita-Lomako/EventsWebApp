@@ -47,14 +47,14 @@ namespace EventsWebApp.MinimalAPI.Endpoints
         {
             APIResponse response = new() { IsSuccess = false, StatusCode = HttpStatusCode.BadRequest };
 
-            bool iFUsernameIsUnique = _authRepo.IsUniqueUser(model.Email);
-            if (!iFUsernameIsUnique)
+            bool iFEmailIsUnique = _authRepo.IsEmailUser(model.Email);
+            if (!iFEmailIsUnique)
             {
                 response.ErrorMessages.Add("Username already exists");
                 return Results.BadRequest(response);
             }
             var registerResponse = await _authRepo.Register(model);
-            if (registerResponse == null || string.IsNullOrEmpty(registerResponse.Email))
+            if (registerResponse == null)
             {
                 response.ErrorMessages.Add("Registration failed. Please check provided information.");
                 return Results.BadRequest(response);

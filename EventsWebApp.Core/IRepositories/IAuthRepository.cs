@@ -9,7 +9,7 @@ namespace EventsWebApp.Core.IRepositories
 {
     public interface IAuthRepository
     {
-        bool IsUniqueUser(string username);
+        bool IsEmailUser(string username);
         Task<LoginResponseDTO?> Login(LoginRequestDTO loginRequestDTO);
         Task<UserDto?> Register(RegistrationRequestDto requestDTO);
     }

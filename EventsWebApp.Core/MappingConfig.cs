@@ -13,21 +13,12 @@ namespace EventsWebApp.Core
     {
         public MappingConfig()
         {
-            // Event mappings
-            CreateMap<Event, EventDto>()
-    .ForMember(dest => dest.CurrentParticipantsCount,
-        opt => opt.MapFrom(src => src.Participants.Count));
-
-            CreateMap<EventDto, Event>();
-
-            CreateMap<EventCreateDto, Event>().ReverseMap();
-            CreateMap<EventUpdateDto, Event>().ReverseMap();
-
-            // Participant mappings
+            CreateMap<Event, EventDto>().ReverseMap();
+            CreateMap<Event, EventCreateDto>().ReverseMap();
+            CreateMap<Event, EventUpdateDto>().ReverseMap();
             CreateMap<Participant, ParticipantDto>().ReverseMap();
-            CreateMap<ParticipantCreateDto, Participant>().ReverseMap();
-
-            // User mappings
+            CreateMap<Participant, ParticipantCreateDto>().ReverseMap();
+            CreateMap<Participant, ParticipantUpdateDto>().ReverseMap();
             CreateMap<UserDto, AppUser>().ReverseMap();
             CreateMap<UserDto, LoginRequestDTO>().ReverseMap();
         }

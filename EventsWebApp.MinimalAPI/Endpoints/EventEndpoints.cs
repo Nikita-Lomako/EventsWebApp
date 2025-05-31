@@ -2,6 +2,7 @@ using AutoMapper;
 using EventsWebApp.Core.Dtos;
 using EventsWebApp.Core.IRepositories;
 using EventsWebApp.Core.Models;
+using EventsWebApp.Core.Services;
 using EventsWebApp.Core.Validation;
 using FluentValidation;
 using Microsoft.AspNetCore.Authorization;
@@ -105,13 +106,27 @@ namespace EventsWebApp.MinimalAPI.Endpoints
             EventCreateDto eventDto,
             IEventRepository eventRepository,
             IMapper mapper,
-            IValidator<EventCreateDto> validator)
+            IValidator<EventCreateDto> validator,
+            IImageService imageService)
         {
             var validationResult = await validator.ValidateAsync(eventDto);
             if (!validationResult.IsValid)
                 return Results.BadRequest(validationResult.Errors);
 
             var eventEntity = mapper.Map<Event>(eventDto);
+
+            try
+            {
+                if (!string.IsNullOrEmpty(eventDto.ImageUrl))
+                {
+                    eventEntity.ImageUrl = await imageService.SaveImageFromUrlAsync(eventDto.ImageUrl);
+                }
+            }
+            catch (ArgumentException ex)
+            {
+                return Results.BadRequest(ex.Message);
+            }
+
             await eventRepository.CreateAsync(eventEntity);
             var createdEventDto = mapper.Map<EventDto>(eventEntity);
 
@@ -123,7 +138,8 @@ namespace EventsWebApp.MinimalAPI.Endpoints
             EventUpdateDto eventDto,
             IEventRepository eventRepository,
             IMapper mapper,
-            IValidator<EventUpdateDto> validator)
+            IValidator<EventUpdateDto> validator,
+            IImageService imageService)
         {
             var validationResult = await validator.ValidateAsync(eventDto);
             if (!validationResult.IsValid)
@@ -134,6 +150,19 @@ namespace EventsWebApp.MinimalAPI.Endpoints
                 return Results.NotFound();
 
             mapper.Map(eventDto, existingEvent);
+
+            try
+            {
+                if (!string.IsNullOrEmpty(eventDto.ImageUrl))
+                {
+                    existingEvent.ImageUrl = await imageService.SaveImageFromUrlAsync(eventDto.ImageUrl);
+                }
+            }
+            catch (ArgumentException ex)
+            {
+                return Results.BadRequest(ex.Message);
+            }
+
             await eventRepository.UpdateAsync(existingEvent);
             var updatedEventDto = mapper.Map<EventDto>(existingEvent);
 

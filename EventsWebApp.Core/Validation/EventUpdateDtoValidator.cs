@@ -35,9 +35,9 @@ namespace EventsWebApp.Core.Validation
                 .NotEmpty()
                 .GreaterThan(0);
 
-            RuleFor(x => x.Image)
-                .Must(file => file == null || file.Length <= 10 * 1024 * 1024) // 10MB max
-                .WithMessage("Image size must be less than 10MB");
+            RuleFor(x => x.ImageUrl)
+                            .Must(url => url == null || url.StartsWith("http://") || url.StartsWith("https://"))
+                            .WithMessage("Image URL must be a valid HTTP(S) URL");
         }
     }
-} 
+}

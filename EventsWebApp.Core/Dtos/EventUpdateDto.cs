@@ -11,6 +11,6 @@ namespace EventsWebApp.Core.Dtos
         public string Venue { get; set; } = string.Empty;
         public string Category { get; set; } = string.Empty;
         public int MaxParticipants { get; set; }
-        public IFormFile? Image { get; set; }
+        public string? ImageUrl { get; set; }
     }
 } 

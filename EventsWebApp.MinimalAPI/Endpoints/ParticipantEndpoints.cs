@@ -52,6 +52,15 @@ namespace EventsWebApp.MinimalAPI.Endpoints
                 .Produces(404)
                 .RequireAuthorization();
 
+            group.MapPut("/{id}", UpdateParticipant)
+                .WithName("UpdateParticipant")
+                .WithSummary("Update participant information")
+                .Accepts<ParticipantUpdateDto>("application/json")
+                .Produces<ParticipantDto>(200)
+                .Produces(400)
+                .Produces(404)
+                .RequireAuthorization();
+
             group.MapDelete("/{id}", CancelRegistration)
                 .WithName("CancelRegistration")
                 .WithSummary("Cancel event registration")
@@ -136,6 +145,38 @@ namespace EventsWebApp.MinimalAPI.Endpoints
             await participantRepository.CreateAsync(participant);
             var result = mapper.Map<ParticipantDto>(participant);
             return Results.Created($"/api/participants/{result.Id}", result);
+        }
+
+        private static async Task<IResult> UpdateParticipant(
+            int id,
+            ParticipantUpdateDto participantDto,
+            IParticipantRepository participantRepository,
+            IMapper mapper,
+            IValidator<ParticipantUpdateDto> validator,
+            ClaimsPrincipal user)
+        {
+            var validationResult = await validator.ValidateAsync(participantDto);
+            if (!validationResult.IsValid)
+                return Results.BadRequest(validationResult.Errors);
+
+            var existingParticipant = await participantRepository.GetAsync(id);
+            if (existingParticipant == null)
+                return Results.NotFound();
+
+            var userId = user.FindFirstValue(ClaimTypes.NameIdentifier) ?? throw new InvalidOperationException("User ID not found");
+            if (!user.IsInRole("Admin") && existingParticipant.UserId != userId)
+                return Results.Forbid();
+
+            // Manually update only the allowed properties
+            existingParticipant.Name = participantDto.Name;
+            existingParticipant.Surname = participantDto.Surname;
+            existingParticipant.DateOfBirth = participantDto.DateOfBirth;
+            existingParticipant.Email = participantDto.Email;
+
+            await participantRepository.SaveAsync();
+
+            var updatedParticipantDto = mapper.Map<ParticipantDto>(existingParticipant);
+            return Results.Ok(updatedParticipantDto);
         }
 
         private static async Task<IResult> CancelRegistration(

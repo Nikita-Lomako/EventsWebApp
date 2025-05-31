@@ -2,10 +2,12 @@ using EventsWebApp.Core;
 using EventsWebApp.Core.Dtos;
 using EventsWebApp.Core.IRepositories;
 using EventsWebApp.Core.Models;
+using EventsWebApp.Core.Services;
 using EventsWebApp.Core.Validation;
 using EventsWebApp.Infrastructure;
 using EventsWebApp.Infrastructure.Data;
 using EventsWebApp.Infrastructure.Repositories;
+using EventsWebApp.Infrastructure.Services;
 using EventsWebApp.MinimalAPI.Endpoints;
 using FluentValidation;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -92,6 +94,12 @@ builder.Services.AddAuthorization(options =>
 // Add AutoMapper
 builder.Services.AddAutoMapper(typeof(MappingConfig));
 
+// Add HTTP Client Factory
+builder.Services.AddHttpClient();
+
+// Add Services
+builder.Services.AddScoped<IImageService, ImageService>();
+
 // Add Repositories
 builder.Services.AddScoped<IAuthRepository, AuthRepository>();
 builder.Services.AddScoped<IEventRepository, EventRepository>();
@@ -101,6 +109,7 @@ builder.Services.AddScoped<IParticipantRepository, ParticipantRepository>();
 builder.Services.AddScoped<IValidator<EventCreateDto>, EventCreateDtoValidator>();
 builder.Services.AddScoped<IValidator<EventUpdateDto>, EventUpdateDtoValidator>();
 builder.Services.AddScoped<IValidator<ParticipantCreateDto>, ParticipantCreateDtoValidator>();
+builder.Services.AddScoped<IValidator<ParticipantUpdateDto>, ParticipantUpdateDtoValidator>();
 
 var app = builder.Build();
 

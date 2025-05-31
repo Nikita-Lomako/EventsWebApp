@@ -7,13 +7,9 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
-using System;
-using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
 using System.Security.Claims;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace EventsWebApp.Infrastructure.Repositories
 {
@@ -39,9 +35,9 @@ namespace EventsWebApp.Infrastructure.Repositories
                 ?? throw new ArgumentNullException("Secret key is missing");
         }
 
-        public bool IsUniqueUser(string username)
+        public bool IsEmailUser(string email)
         {
-            var user = _db.AppUsers.FirstOrDefault(x => x.UserName == username);
+            var user = _db.AppUsers.FirstOrDefault(x => x.Email == email);
             return user == null;
         }
 
@@ -57,7 +53,8 @@ namespace EventsWebApp.Infrastructure.Repositories
 
             var claims = new List<Claim>
             {
-                new Claim(ClaimTypes.Email, user.UserName ?? string.Empty)
+                new Claim(ClaimTypes.Email, user.UserName ?? string.Empty),
+                new Claim(ClaimTypes.NameIdentifier, user.Id)
             };
 
             foreach (var role in roles)
@@ -108,12 +105,12 @@ namespace EventsWebApp.Infrastructure.Repositories
             }
 
             // Create roles if they don't exist
-            if (!await _roleManager.RoleExistsAsync("admin"))
+            if (!await _roleManager.RoleExistsAsync("user"))
             {
                 await _roleManager.CreateAsync(new IdentityRole("admin"));
                 await _roleManager.CreateAsync(new IdentityRole("user"));
             }
-            await _userManager.AddToRoleAsync(userobj, "admin");
+            await _userManager.AddToRoleAsync(userobj, "user");
 
             var user = _db.AppUsers.FirstOrDefault(u => u.UserName == requestDTO.Email);
             return user != null ? _mapper.Map<UserDto>(user) : null;
