@@ -95,7 +95,7 @@ namespace EventsWebApp.Infrastructure.Repositories
                 NormalizedUserName = requestDTO.Email.ToUpper()
             };
 
-            if (await _userManager.FindByNameAsync(requestDTO.Email) != null)
+            if (await _userManager.FindByEmailAsync(requestDTO.Email) != null)
             {
                 return null;
             }
