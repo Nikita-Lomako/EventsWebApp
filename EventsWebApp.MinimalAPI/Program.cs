@@ -21,6 +21,24 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container
 builder.Services.AddEndpointsApiExplorer();
+
+// Add CORS
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowFrontend", policy =>
+    {
+        policy.WithOrigins(
+            "http://localhost:14729",    // Vite current port
+            "https://localhost:14729",   // Vite HTTPS port
+            "http://localhost:5173",     // Vite default HTTP port
+            "https://localhost:5173"     // Vite HTTPS port
+        )
+        .AllowAnyMethod()
+        .AllowAnyHeader()
+        .AllowCredentials();
+    });
+});
+
 builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new OpenApiInfo { Title = "Events Web API", Version = "v1" });
@@ -121,6 +139,9 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+// Add CORS middleware
+app.UseCors("AllowFrontend");
 
 app.UseAuthentication();
 app.UseAuthorization();

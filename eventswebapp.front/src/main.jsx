@@ -6,7 +6,8 @@ import App from './App';
 import './index.css';
 
 // Configure axios defaults
-axios.defaults.baseURL = 'http://localhost:5000';
+axios.defaults.baseURL = 'http://localhost:5159';
+axios.defaults.baseURL = 'https://localhost:7154'; // Äëÿ HTTPS
 axios.defaults.headers.common['Content-Type'] = 'application/json';
 
 // Create a client

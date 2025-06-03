@@ -21,8 +21,13 @@ const Home = () => {
   const { data: featuredEvents, isLoading, error } = useQuery({
     queryKey: ['featured-events'],
     queryFn: async () => {
-      const response = await axios.get('/api/events?page=1&pageSize=3');
-      return response.data.items;
+      try {
+        const response = await axios.get('/api/events?page=1&pageSize=3');
+        return response.data?.items || [];
+      } catch (error) {
+        console.error('Error fetching featured events:', error);
+        return [];
+      }
     }
   });
 

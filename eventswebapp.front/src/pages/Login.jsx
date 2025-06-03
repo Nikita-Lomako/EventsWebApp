@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { useNavigate, Link as RouterLink } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { useNavigate, Link as RouterLink, useLocation } from 'react-router-dom';
 import {
   Container,
   Paper,
@@ -18,17 +18,29 @@ const validationSchema = yup.object({
   email: yup
     .string()
     .email('Enter a valid email')
-    .required('Email is required'),
+    .required('Email is required')
+    .trim(),
   password: yup
     .string()
     .min(6, 'Password should be of minimum 6 characters length')
-    .required('Password is required'),
+    .required('Password is required')
+    .trim(),
 });
 
 const Login = () => {
   const [error, setError] = useState('');
+  const [successMessage, setSuccessMessage] = useState('');
   const navigate = useNavigate();
+  const location = useLocation();
   const { login } = useAuth();
+
+  useEffect(() => {
+    if (location.state?.message) {
+      setSuccessMessage(location.state.message);
+      // Clear the message from location state
+      window.history.replaceState({}, document.title);
+    }
+  }, [location]);
 
   const formik = useFormik({
     initialValues: {
@@ -36,12 +48,16 @@ const Login = () => {
       password: '',
     },
     validationSchema: validationSchema,
+    validateOnChange: false,
+    validateOnBlur: true,
     onSubmit: async (values) => {
       try {
-        await login(values.email, values.password);
-        navigate('/');
+        const result = await login(values.email.trim(), values.password.trim());
+        if (result.success) {
+          navigate('/');
+        }
       } catch (err) {
-        setError(err.response?.data?.message || 'An error occurred during login');
+        setError(err.response?.data?.errorMessages?.[0] || 'An error occurred during login');
       }
     },
   });
@@ -54,13 +70,19 @@ const Login = () => {
             Login
           </Typography>
 
+          {successMessage && (
+            <Alert severity="success" sx={{ mb: 2 }}>
+              {successMessage}
+            </Alert>
+          )}
+
           {error && (
             <Alert severity="error" sx={{ mb: 2 }}>
               {error}
             </Alert>
           )}
 
-          <form onSubmit={formik.handleSubmit}>
+          <form onSubmit={formik.handleSubmit} noValidate>
             <TextField
               fullWidth
               id="email"
@@ -68,9 +90,11 @@ const Login = () => {
               label="Email"
               value={formik.values.email}
               onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
               error={formik.touched.email && Boolean(formik.errors.email)}
               helperText={formik.touched.email && formik.errors.email}
               margin="normal"
+              autoComplete="email"
             />
             <TextField
               fullWidth
@@ -80,9 +104,11 @@ const Login = () => {
               type="password"
               value={formik.values.password}
               onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
               error={formik.touched.password && Boolean(formik.errors.password)}
               helperText={formik.touched.password && formik.errors.password}
               margin="normal"
+              autoComplete="current-password"
             />
             <Button
               type="submit"

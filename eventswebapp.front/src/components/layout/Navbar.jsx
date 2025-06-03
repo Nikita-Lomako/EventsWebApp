@@ -1,4 +1,4 @@
-import { AppBar, Toolbar, Typography, Button, Box, IconButton } from '@mui/material';
+import { AppBar, Toolbar, Typography, Button, Box, IconButton, Container } from '@mui/material';
 import { Link as RouterLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import EventIcon from '@mui/icons-material/Event';
@@ -15,78 +15,86 @@ const Navbar = () => {
 
   return (
     <AppBar position="static">
-      <Toolbar>
-        <EventIcon sx={{ mr: 2 }} />
-        <Typography
-          variant="h6"
-          component={RouterLink}
-          to="/"
-          sx={{ flexGrow: 1, textDecoration: 'none', color: 'inherit' }}
-        >
-          Events Web App
-        </Typography>
-
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-          <Button
-            color="inherit"
+      <Container maxWidth="xl">
+        <Toolbar disableGutters>
+          <EventIcon sx={{ mr: 2 }} />
+          <Typography
+            variant="h6"
             component={RouterLink}
-            to="/events"
+            to="/"
+            sx={{ 
+              flexGrow: 1, 
+              textDecoration: 'none', 
+              color: 'inherit',
+              display: 'flex',
+              alignItems: 'center'
+            }}
           >
-            Events
-          </Button>
+            Events Web App
+          </Typography>
 
-          {isAuthenticated ? (
-            <>
-              <Button
-                color="inherit"
-                component={RouterLink}
-                to="/my-events"
-              >
-                My Events
-              </Button>
-              {isAdmin && (
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+            <Button
+              color="inherit"
+              component={RouterLink}
+              to="/events"
+            >
+              Events
+            </Button>
+
+            {isAuthenticated ? (
+              <>
                 <Button
                   color="inherit"
                   component={RouterLink}
-                  to="/admin"
+                  to="/my-events"
                 >
-                  Admin
+                  My Events
                 </Button>
-              )}
-              <IconButton
-                color="inherit"
-                component={RouterLink}
-                to="/profile"
-              >
-                <AccountCircle />
-              </IconButton>
-              <Button
-                color="inherit"
-                onClick={handleLogout}
-              >
-                Logout
-              </Button>
-            </>
-          ) : (
-            <>
-              <Button
-                color="inherit"
-                component={RouterLink}
-                to="/login"
-              >
-                Login
-              </Button>
-              <Button
-                color="inherit"
-                component={RouterLink}
-                to="/register"
-              >
-                Register
-              </Button>
-            </>
-          )}
-        </Box>
-      </Toolbar>
+                {isAdmin && (
+                  <Button
+                    color="inherit"
+                    component={RouterLink}
+                    to="/admin"
+                  >
+                    Admin
+                  </Button>
+                )}
+                <IconButton
+                  color="inherit"
+                  component={RouterLink}
+                  to="/profile"
+                >
+                  <AccountCircle />
+                </IconButton>
+                <Button
+                  color="inherit"
+                  onClick={handleLogout}
+                >
+                  Logout
+                </Button>
+              </>
+            ) : (
+              <>
+                <Button
+                  color="inherit"
+                  component={RouterLink}
+                  to="/login"
+                >
+                  Login
+                </Button>
+                <Button
+                  color="inherit"
+                  component={RouterLink}
+                  to="/register"
+                >
+                  Register
+                </Button>
+              </>
+            )}
+          </Box>
+        </Toolbar>
+      </Container>
     </AppBar>
   );
 };

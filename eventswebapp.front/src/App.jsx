@@ -1,7 +1,8 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { ThemeProvider, createTheme } from '@mui/material';
 import CssBaseline from '@mui/material/CssBaseline';
-import Navbar from './components/layout/Navbar';
+import { GlobalStyles } from '@mui/material';
+import MainLayout from './components/layout/MainLayout';
 import Home from './pages/Home';
 import EventList from './pages/EventList';
 import EventDetails from './pages/EventDetails';
@@ -10,7 +11,8 @@ import MyEvents from './pages/MyEvents';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import AdminDashboard from './pages/AdminDashboard';
-import { AuthProvider } from './contexts/AuthContext';
+import AuthWarning from './components/common/AuthWarning';
+import { AuthProvider, useAuth } from './contexts/AuthContext';
 
 const theme = createTheme({
   palette: {
@@ -20,26 +22,134 @@ const theme = createTheme({
     secondary: {
       main: '#dc004e',
     },
+    background: {
+      default: '#f5f5f5',
+    },
+  },
+  components: {
+    MuiCssBaseline: {
+      styleOverrides: {
+        body: {
+          margin: 0,
+          padding: 0,
+          minHeight: '100vh',
+          width: '100%',
+          WebkitTextSizeAdjust: '100%',
+          WebkitPrintColorAdjust: 'exact',
+          colorAdjust: 'exact',
+        },
+        '#root': {
+          minHeight: '100vh',
+          width: '100%',
+          display: 'flex',
+          flexDirection: 'column',
+        },
+      },
+    },
   },
 });
+
+const globalStyles = {
+  html: {
+    WebkitTextSizeAdjust: '100%',
+  },
+  '@media print': {
+    '*': {
+      WebkitPrintColorAdjust: 'exact',
+      colorAdjust: 'exact',
+    },
+  },
+};
+
+const ProtectedRoute = ({ children, requireAdmin = false }) => {
+  const { isAuthenticated, isAdmin, loading } = useAuth();
+
+  if (loading) {
+    return null; // or a loading spinner
+  }
+
+  if (!isAuthenticated) {
+    return <AuthWarning />;
+  }
+
+  if (requireAdmin && !isAdmin) {
+    return <AuthWarning message="You need administrator privileges to access this page" />;
+  }
+
+  return children;
+};
+
+// Redirect to login if not authenticated
+const PublicRoute = ({ children }) => {
+  const { isAuthenticated, loading } = useAuth();
+
+  if (loading) {
+    return null;
+  }
+
+  if (isAuthenticated) {
+    return <Navigate to="/" replace />;
+  }
+
+  return children;
+};
 
 function App() {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
+      <GlobalStyles styles={globalStyles} />
       <AuthProvider>
         <Router>
-          <Navbar />
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/events" element={<EventList />} />
-            <Route path="/events/:id" element={<EventDetails />} />
-            <Route path="/events/:id/register" element={<EventRegistration />} />
-            <Route path="/my-events" element={<MyEvents />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Register />} />
-            <Route path="/admin" element={<AdminDashboard />} />
-          </Routes>
+          <MainLayout>
+            <Routes>
+              <Route path="/" element={<Home />} />
+              <Route path="/events" element={<EventList />} />
+              <Route path="/events/:id" element={<EventDetails />} />
+              <Route 
+                path="/events/:id/register" 
+                element={
+                  <ProtectedRoute>
+                    <EventRegistration />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/my-events" 
+                element={
+                  <ProtectedRoute>
+                    <MyEvents />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/login" 
+                element={
+                  <PublicRoute>
+                    <Login />
+                  </PublicRoute>
+                } 
+              />
+              <Route 
+                path="/register" 
+                element={
+                  <PublicRoute>
+                    <Register />
+                  </PublicRoute>
+                } 
+              />
+              <Route 
+                path="/admin" 
+                element={
+                  <ProtectedRoute requireAdmin>
+                    <AdminDashboard />
+                  </ProtectedRoute>
+                } 
+              />
+              {/* Catch all route - redirect to home */}
+              <Route path="*" element={<Navigate to="/" replace />} />
+            </Routes>
+          </MainLayout>
         </Router>
       </AuthProvider>
     </ThemeProvider>

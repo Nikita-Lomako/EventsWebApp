@@ -18,21 +18,18 @@ const validationSchema = yup.object({
   email: yup
     .string()
     .email('Enter a valid email')
-    .required('Email is required'),
+    .required('Email is required')
+    .trim(),
   password: yup
     .string()
     .min(6, 'Password should be of minimum 6 characters length')
-    .required('Password is required'),
+    .required('Password is required')
+    .trim(),
   confirmPassword: yup
     .string()
     .oneOf([yup.ref('password'), null], 'Passwords must match')
-    .required('Confirm password is required'),
-  firstName: yup
-    .string()
-    .required('First name is required'),
-  lastName: yup
-    .string()
-    .required('Last name is required'),
+    .required('Confirm password is required')
+    .trim(),
 });
 
 const Register = () => {
@@ -45,17 +42,25 @@ const Register = () => {
       email: '',
       password: '',
       confirmPassword: '',
-      firstName: '',
-      lastName: '',
     },
     validationSchema: validationSchema,
+    validateOnChange: false,
+    validateOnBlur: true,
     onSubmit: async (values) => {
       try {
         const { confirmPassword, ...registerData } = values;
-        await register(registerData);
-        navigate('/');
+        // Trim all string values before sending
+        const trimmedData = Object.fromEntries(
+          Object.entries(registerData).map(([key, value]) => [key, value.trim()])
+        );
+        const result = await register(trimmedData);
+        if (result.success) {
+          navigate('/login', { 
+            state: { message: result.message }
+          });
+        }
       } catch (err) {
-        setError(err.response?.data?.message || 'An error occurred during registration');
+        setError(err.response?.data?.errorMessages?.[0] || 'An error occurred during registration');
       }
     },
   });
@@ -74,29 +79,7 @@ const Register = () => {
             </Alert>
           )}
 
-          <form onSubmit={formik.handleSubmit}>
-            <TextField
-              fullWidth
-              id="firstName"
-              name="firstName"
-              label="First Name"
-              value={formik.values.firstName}
-              onChange={formik.handleChange}
-              error={formik.touched.firstName && Boolean(formik.errors.firstName)}
-              helperText={formik.touched.firstName && formik.errors.firstName}
-              margin="normal"
-            />
-            <TextField
-              fullWidth
-              id="lastName"
-              name="lastName"
-              label="Last Name"
-              value={formik.values.lastName}
-              onChange={formik.handleChange}
-              error={formik.touched.lastName && Boolean(formik.errors.lastName)}
-              helperText={formik.touched.lastName && formik.errors.lastName}
-              margin="normal"
-            />
+          <form onSubmit={formik.handleSubmit} noValidate>
             <TextField
               fullWidth
               id="email"
@@ -104,9 +87,11 @@ const Register = () => {
               label="Email"
               value={formik.values.email}
               onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
               error={formik.touched.email && Boolean(formik.errors.email)}
               helperText={formik.touched.email && formik.errors.email}
               margin="normal"
+              autoComplete="email"
             />
             <TextField
               fullWidth
@@ -116,9 +101,11 @@ const Register = () => {
               type="password"
               value={formik.values.password}
               onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
               error={formik.touched.password && Boolean(formik.errors.password)}
               helperText={formik.touched.password && formik.errors.password}
               margin="normal"
+              autoComplete="new-password"
             />
             <TextField
               fullWidth
@@ -128,9 +115,11 @@ const Register = () => {
               type="password"
               value={formik.values.confirmPassword}
               onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
               error={formik.touched.confirmPassword && Boolean(formik.errors.confirmPassword)}
               helperText={formik.touched.confirmPassword && formik.errors.confirmPassword}
               margin="normal"
+              autoComplete="new-password"
             />
             <Button
               type="submit"

@@ -3,6 +3,7 @@ using EventsWebApp.Core.IRepositories;
 using EventsWebApp.Core.Models;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
+using System.Security.Claims;
 
 namespace EventsWebApp.MinimalAPI.Endpoints
 {
@@ -21,7 +22,7 @@ namespace EventsWebApp.MinimalAPI.Endpoints
                 .WithName("Register")
                 .Accepts<RegistrationRequestDto>("application/json")
                 .Produces<APIResponse>(StatusCodes.Status200OK)
-                .Produces<APIResponse>(StatusCodes.Status400BadRequest);
+                .Produces<APIResponse>(StatusCodes.Status400BadRequest);           
         }
 
         private async static Task<IResult> Login(IAuthRepository _authRepo,
