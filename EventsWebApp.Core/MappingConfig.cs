@@ -13,7 +13,9 @@ namespace EventsWebApp.Core
     {
         public MappingConfig()
         {
-            CreateMap<Event, EventDto>().ReverseMap();
+            CreateMap<Event, EventDto>()
+    .ForMember(dest => dest.CurrentParticipantsCount,
+        opt => opt.MapFrom(src => src.Participants.Count));
             CreateMap<Event, EventCreateDto>().ReverseMap();
             CreateMap<Event, EventUpdateDto>().ReverseMap();
             CreateMap<Participant, ParticipantDto>().ReverseMap();

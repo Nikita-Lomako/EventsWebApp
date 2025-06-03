@@ -50,6 +50,7 @@ const Login = () => {
     validationSchema: validationSchema,
     validateOnChange: false,
     validateOnBlur: true,
+    validateOnMount: false,
     onSubmit: async (values) => {
       try {
         const result = await login(values.email.trim(), values.password.trim());
@@ -95,6 +96,10 @@ const Login = () => {
               helperText={formik.touched.email && formik.errors.email}
               margin="normal"
               autoComplete="email"
+              inputProps={{
+                'aria-label': 'Email address',
+                'aria-required': 'true'
+              }}
             />
             <TextField
               fullWidth
@@ -109,12 +114,17 @@ const Login = () => {
               helperText={formik.touched.password && formik.errors.password}
               margin="normal"
               autoComplete="current-password"
+              inputProps={{
+                'aria-label': 'Password',
+                'aria-required': 'true'
+              }}
             />
             <Button
               type="submit"
               fullWidth
               variant="contained"
               sx={{ mt: 3, mb: 2 }}
+              aria-label="Login"
             >
               Login
             </Button>

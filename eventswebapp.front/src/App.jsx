@@ -34,7 +34,9 @@ const theme = createTheme({
           padding: 0,
           minHeight: '100vh',
           width: '100%',
+          textSizeAdjust: '100%',
           WebkitTextSizeAdjust: '100%',
+          printColorAdjust: 'exact',
           WebkitPrintColorAdjust: 'exact',
           colorAdjust: 'exact',
         },
@@ -51,10 +53,12 @@ const theme = createTheme({
 
 const globalStyles = {
   html: {
+    textSizeAdjust: '100%',
     WebkitTextSizeAdjust: '100%',
   },
   '@media print': {
     '*': {
+      printColorAdjust: 'exact',
       WebkitPrintColorAdjust: 'exact',
       colorAdjust: 'exact',
     },

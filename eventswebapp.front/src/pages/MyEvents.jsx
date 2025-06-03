@@ -14,7 +14,7 @@ import {
 } from '@mui/material';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
-import { format } from 'date-fns';
+import { format, isValid } from 'date-fns';
 import { useAuth } from '../contexts/AuthContext';
 
 const MyEvents = () => {
@@ -40,6 +40,19 @@ const MyEvents = () => {
 
   const handleEventClick = (eventId) => {
     navigate(`/events/${eventId}`);
+  };
+
+  const formatDate = (dateString) => {
+    try {
+      const date = new Date(dateString);
+      if (!isValid(date)) {
+        return 'Invalid date';
+      }
+      return format(date, 'PPP');
+    } catch (error) {
+      console.error('Error formatting date:', error);
+      return 'Invalid date';
+    }
   };
 
   if (isLoading) {
@@ -121,7 +134,7 @@ const MyEvents = () => {
                   />
                 </Box>
                 <Typography variant="body2" color="text.secondary">
-                  {format(new Date(event.date), 'PPP')}
+                  {formatDate(event.date)}
                 </Typography>
                 <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
                   {event.currentParticipants}/{event.maxParticipants} participants

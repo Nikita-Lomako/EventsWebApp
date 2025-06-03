@@ -22,7 +22,7 @@ namespace EventsWebApp.MinimalAPI.Endpoints
                 .WithName("Register")
                 .Accepts<RegistrationRequestDto>("application/json")
                 .Produces<APIResponse>(StatusCodes.Status200OK)
-                .Produces<APIResponse>(StatusCodes.Status400BadRequest);           
+                .Produces<APIResponse>(StatusCodes.Status400BadRequest);
         }
 
         private async static Task<IResult> Login(IAuthRepository _authRepo,
@@ -51,7 +51,7 @@ namespace EventsWebApp.MinimalAPI.Endpoints
             bool iFEmailIsUnique = _authRepo.IsEmailUser(model.Email);
             if (!iFEmailIsUnique)
             {
-                response.ErrorMessages.Add("Username already exists");
+                response.ErrorMessages.Add("Email already exists");
                 return Results.BadRequest(response);
             }
             var registerResponse = await _authRepo.Register(model);
