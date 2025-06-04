@@ -19,17 +19,15 @@ const validationSchema = yup.object({
     .string()
     .email('Enter a valid email')
     .required('Email is required')
-    .trim(),
+    .max(100, 'Email must not exceed 100 characters'),
   password: yup
     .string()
     .min(6, 'Password should be of minimum 6 characters length')
-    .required('Password is required')
-    .trim(),
+    .required('Password is required'),
   confirmPassword: yup
     .string()
     .oneOf([yup.ref('password'), null], 'Passwords must match')
     .required('Confirm password is required')
-    .trim(),
 });
 
 const Register = () => {
@@ -49,18 +47,14 @@ const Register = () => {
     validateOnMount: false,
     onSubmit: async (values) => {
       try {
-        const { confirmPassword, ...registerData } = values;
-        const trimmedData = Object.fromEntries(
-          Object.entries(registerData).map(([key, value]) => [key, value.trim()])
-        );
-        const result = await register(trimmedData);
+        const result = await register(values);
         if (result.success) {
           navigate('/login', { 
             state: { message: result.message }
           });
         }
       } catch (err) {
-        setError(err.response?.data?.errorMessages?.[0] || 'An error occurred during registration');
+        setError(err.message || 'An error occurred during registration');
       }
     },
   });

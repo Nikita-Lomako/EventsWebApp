@@ -100,7 +100,7 @@ const Home = () => {
               <CardMedia
                 component="img"
                 height="200"
-                image={event.imageUrl || 'https://via.placeholder.com/300x200'}
+                image={event.imageUrl || 'https://placehold.co/300x200'}
                 alt={event.title}
               />
               <CardContent sx={{ flexGrow: 1 }}>

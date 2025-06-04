@@ -26,7 +26,19 @@ const MyEvents = () => {
     queryKey: ['my-events'],
     queryFn: async () => {
       const response = await axios.get('/api/participants/user');
-      return response.data;
+      // The response contains participant data with event details
+      return response.data.map(participant => ({
+        id: participant.event.id,
+        title: participant.event.title,
+        description: participant.event.description,
+        date: participant.event.dateTime,
+        location: participant.event.venue,
+        category: participant.event.category,
+        imageUrl: participant.event.imageUrl,
+        currentParticipants: participant.event.currentParticipantsCount,
+        maxParticipants: participant.event.maxParticipants,
+        participantId: participant.id // Keep track of the participant ID for cancellation
+      }));
     },
     enabled: !!user
   });
@@ -110,7 +122,7 @@ const MyEvents = () => {
               <CardMedia
                 component="img"
                 height="200"
-                image={event.imageUrl || 'https://via.placeholder.com/300x200'}
+                image={event.imageUrl || 'https://placehold.co/300x200'}
                 alt={event.title}
                 sx={{ cursor: 'pointer' }}
                 onClick={() => handleEventClick(event.id)}
@@ -143,7 +155,7 @@ const MyEvents = () => {
                   variant="outlined"
                   color="error"
                   fullWidth
-                  onClick={() => cancelRegistrationMutation.mutate(event.id)}
+                  onClick={() => cancelRegistrationMutation.mutate(event.participantId)}
                   disabled={cancelRegistrationMutation.isLoading}
                 >
                   Cancel Registration

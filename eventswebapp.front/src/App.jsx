@@ -13,6 +13,7 @@ import Register from './pages/Register';
 import AdminDashboard from './pages/AdminDashboard';
 import AuthWarning from './components/common/AuthWarning';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
+import { Container, CircularProgress } from '@mui/material';
 
 const theme = createTheme({
   palette: {
@@ -34,11 +35,12 @@ const theme = createTheme({
           padding: 0,
           minHeight: '100vh',
           width: '100%',
-          textSizeAdjust: '100%',
           WebkitTextSizeAdjust: '100%',
-          printColorAdjust: 'exact',
+          MozTextSizeAdjust: '100%',
+          msTextSizeAdjust: '100%',
+          textSizeAdjust: '100%',
           WebkitPrintColorAdjust: 'exact',
-          colorAdjust: 'exact',
+          printColorAdjust: 'exact'
         },
         '#root': {
           minHeight: '100vh',
@@ -55,21 +57,26 @@ const globalStyles = {
   html: {
     textSizeAdjust: '100%',
     WebkitTextSizeAdjust: '100%',
+    MozTextSizeAdjust: '100%',
+    msTextSizeAdjust: '100%'
   },
   '@media print': {
     '*': {
       printColorAdjust: 'exact',
-      WebkitPrintColorAdjust: 'exact',
-      colorAdjust: 'exact',
-    },
-  },
+      WebkitPrintColorAdjust: 'exact'
+    }
+  }
 };
 
 const ProtectedRoute = ({ children, requireAdmin = false }) => {
   const { isAuthenticated, isAdmin, loading } = useAuth();
 
   if (loading) {
-    return null; // or a loading spinner
+    return (
+      <Container sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
+        <CircularProgress />
+      </Container>
+    );
   }
 
   if (!isAuthenticated) {
@@ -88,7 +95,11 @@ const PublicRoute = ({ children }) => {
   const { isAuthenticated, loading } = useAuth();
 
   if (loading) {
-    return null;
+    return (
+      <Container sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
+        <CircularProgress />
+      </Container>
+    );
   }
 
   if (isAuthenticated) {

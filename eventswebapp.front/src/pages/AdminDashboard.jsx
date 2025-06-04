@@ -216,6 +216,10 @@ const AdminDashboard = () => {
                   onChange={formik.handleChange}
                   error={formik.touched.title && Boolean(formik.errors.title)}
                   helperText={formik.touched.title && formik.errors.title}
+                  inputProps={{
+                    'aria-label': 'Event title',
+                    'aria-required': 'true'
+                  }}
                 />
               </Grid>
               <Grid item xs={12}>
@@ -229,6 +233,10 @@ const AdminDashboard = () => {
                   onChange={formik.handleChange}
                   error={formik.touched.description && Boolean(formik.errors.description)}
                   helperText={formik.touched.description && formik.errors.description}
+                  inputProps={{
+                    'aria-label': 'Event description',
+                    'aria-required': 'true'
+                  }}
                 />
               </Grid>
               <Grid item xs={12} sm={6}>
@@ -242,6 +250,10 @@ const AdminDashboard = () => {
                   error={formik.touched.date && Boolean(formik.errors.date)}
                   helperText={formik.touched.date && formik.errors.date}
                   InputLabelProps={{ shrink: true }}
+                  inputProps={{
+                    'aria-label': 'Event date',
+                    'aria-required': 'true'
+                  }}
                 />
               </Grid>
               <Grid item xs={12} sm={6}>
@@ -253,6 +265,10 @@ const AdminDashboard = () => {
                   onChange={formik.handleChange}
                   error={formik.touched.location && Boolean(formik.errors.location)}
                   helperText={formik.touched.location && formik.errors.location}
+                  inputProps={{
+                    'aria-label': 'Event location',
+                    'aria-required': 'true'
+                  }}
                 />
               </Grid>
               <Grid item xs={12} sm={6}>
@@ -264,6 +280,10 @@ const AdminDashboard = () => {
                   onChange={formik.handleChange}
                   error={formik.touched.category && Boolean(formik.errors.category)}
                   helperText={formik.touched.category && formik.errors.category}
+                  inputProps={{
+                    'aria-label': 'Event category',
+                    'aria-required': 'true'
+                  }}
                 />
               </Grid>
               <Grid item xs={12} sm={6}>
@@ -276,6 +296,11 @@ const AdminDashboard = () => {
                   onChange={formik.handleChange}
                   error={formik.touched.maxParticipants && Boolean(formik.errors.maxParticipants)}
                   helperText={formik.touched.maxParticipants && formik.errors.maxParticipants}
+                  inputProps={{
+                    'aria-label': 'Maximum number of participants',
+                    'aria-required': 'true',
+                    min: 1
+                  }}
                 />
               </Grid>
             </Grid>

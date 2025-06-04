@@ -139,7 +139,7 @@ const EventDetails = () => {
           <Grid item xs={12} md={4}>
             <Box
               component="img"
-              src={event.imageUrl || 'https://via.placeholder.com/400x300'}
+              src={event.imageUrl || 'https://placehold.co/400x300'}
               alt={event.title}
               sx={{
                 width: '100%',

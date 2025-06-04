@@ -119,6 +119,10 @@ const EventRegistration = () => {
                       label="Name"
                       error={touched.name && Boolean(errors.name)}
                       helperText={touched.name && errors.name}
+                      inputProps={{
+                        'aria-label': 'Name',
+                        'aria-required': 'true'
+                      }}
                     />
                   </Grid>
                   <Grid item xs={12} sm={6}>
@@ -129,6 +133,10 @@ const EventRegistration = () => {
                       label="Surname"
                       error={touched.surname && Boolean(errors.surname)}
                       helperText={touched.surname && errors.surname}
+                      inputProps={{
+                        'aria-label': 'Surname',
+                        'aria-required': 'true'
+                      }}
                     />
                   </Grid>
                   <Grid item xs={12}>
@@ -140,7 +148,11 @@ const EventRegistration = () => {
                         textField: {
                           fullWidth: true,
                           error: touched.dateOfBirth && Boolean(errors.dateOfBirth),
-                          helperText: touched.dateOfBirth && errors.dateOfBirth
+                          helperText: touched.dateOfBirth && errors.dateOfBirth,
+                          inputProps: {
+                            'aria-label': 'Date of Birth',
+                            'aria-required': 'true'
+                          }
                         }
                       }}
                     />
@@ -154,6 +166,10 @@ const EventRegistration = () => {
                       type="email"
                       error={touched.email && Boolean(errors.email)}
                       helperText={touched.email && errors.email}
+                      inputProps={{
+                        'aria-label': 'Email address',
+                        'aria-required': 'true'
+                      }}
                     />
                   </Grid>
                   <Grid item xs={12}>

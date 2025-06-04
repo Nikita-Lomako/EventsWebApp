@@ -107,8 +107,11 @@ namespace EventsWebApp.Infrastructure.Repositories
             // Create roles if they don't exist
             if (!await _roleManager.RoleExistsAsync("user"))
             {
-                await _roleManager.CreateAsync(new IdentityRole("admin"));
                 await _roleManager.CreateAsync(new IdentityRole("user"));
+            }
+            if (!await _roleManager.RoleExistsAsync("admin"))
+            {
+                await _roleManager.CreateAsync(new IdentityRole("admin"));
             }
             await _userManager.AddToRoleAsync(userobj, "user");
 
